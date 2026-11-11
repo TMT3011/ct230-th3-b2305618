@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import vn.edu.bookstore.catalog.api.BookController;
 import vn.edu.bookstore.catalog.api.error.GlobalProblemHandler;
 import vn.edu.bookstore.catalog.domain.BookEntity;
+import vn.edu.bookstore.catalog.service.BookNotFoundException;
 import vn.edu.bookstore.catalog.service.BookService;
 
 /**
@@ -24,6 +25,7 @@ public abstract class ContractVerifierBase {
         given(service.get("9780134685991")).willReturn(new BookEntity("9780134685991", "Effective Java",
                 "Joshua Bloch", 42L, 2018, new BigDecimal("285000.00"), "VND"));
         // TODO(TH3-7): giả lập service.get("9789999999999") ném BookNotFoundException cho hợp đồng getBookNotFound
+        given(service.get("9789999999999")).willThrow(new BookNotFoundException("9789999999999"));
         RestAssuredMockMvc.standaloneSetup(MockMvcBuilders.standaloneSetup(new BookController(service))
                 .setControllerAdvice(new GlobalProblemHandler()));
     }

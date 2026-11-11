@@ -12,6 +12,7 @@ import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties
 import org.springframework.context.annotation.Import;
 import org.springframework.web.client.RestClient;
 import vn.edu.bookstore.order.TestcontainersConfig;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * TH3-7: kiểm thử hợp đồng phía BÊN TIÊU THỤ.
@@ -45,4 +46,9 @@ class CatalogClientContractTest {
 
     // TODO(TH3-7): sau khi thêm hợp đồng getBookNotFound.yml ở catalog-service, viết ca kiểm thử:
     //   client().getBook("9789999999999") ném UnknownBookException
+    @Test
+    void sachKhongTonTaiTheoHopDong() {
+        assertThatThrownBy(() -> client().getBook("9789999999999"))
+                .isInstanceOf(UnknownBookException.class);
+    }
 }
