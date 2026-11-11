@@ -34,6 +34,14 @@ public class OrderService {
         // TODO(TH3-4): nếu có idempotencyKey và đã có đơn với khoá này thì trả lại đơn cũ
         //   (gọi replay(idempotencyKey, hash)); cùng khoá nhưng khác nội dung → IdempotencyConflictException
         // Gọi catalog-service NGOÀI giao dịch CSDL (không giữ kết nối CSDL trong lúc chờ mạng)
+
+        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
+            Optional<PlaceOrderResult> replayed = replay(idempotencyKey, hash);
+            if (replayed.isPresent()) {
+                return replayed.get();
+            }
+        }
+
         List<Priced> priced = new ArrayList<>();
         for (CreateOrderRequest.Line line : request.lines()) {
             BookInfo book = catalog.getBook(line.isbn());

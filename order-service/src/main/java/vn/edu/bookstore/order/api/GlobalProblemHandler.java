@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import vn.edu.bookstore.order.client.CatalogUnavailableException;
 import vn.edu.bookstore.order.client.UnknownBookException;
 import vn.edu.bookstore.order.service.IdempotencyConflictException;
 import vn.edu.bookstore.order.service.InvalidOrderException;
@@ -36,6 +38,16 @@ public class GlobalProblemHandler extends ResponseEntityExceptionHandler {
 
     // TODO(TH3-5): @ExceptionHandler(CatalogUnavailableException.class) → 503, type upstream-unavailable,
     //   kèm header Retry-After: 10
+    @ExceptionHandler(CatalogUnavailableException.class)
+    ResponseEntity<ProblemDetail> upstream(CatalogUnavailableException e, HttpServletRequest req) {
+        ProblemDetail p = problem(HttpStatus.SERVICE_UNAVAILABLE, UPSTREAM_UNAVAILABLE,
+                "Dịch vụ danh mục tạm thời không sẵn sàng", e.getMessage(), req);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .header(HttpHeaders.RETRY_AFTER, "10")
+                .body(p);
+    }
+
+
 
     @ExceptionHandler(InvalidOrderException.class)
     ProblemDetail invalid(InvalidOrderException e, HttpServletRequest req) {
